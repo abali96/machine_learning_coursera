@@ -1,0 +1,229 @@
+\documentclass[11pt,letterpaper]{article}
+%\usepackage[left=1in, top=1in, bottom=1in]{geometry}
+\usepackage{amsmath}
+\usepackage{listings}
+\usepackage{graphicx}
+\begin{document}
+\title{Machine Learning Notes - Coursera Stanford Course}
+\maketitle
+\section{Week 1}
+\subsection{Introduction}
+Supervised Learning: We are told the correct answer, and we base predictions off of those. Example: predicting house prices.\\
+\\
+Unsupervised Learning: We are not told what each data point represents. The algorithm tries to find structure in the data. (Think clustering algorithms). Example: auto-clustering of news into sections regarding certain topics.\\
+\\
+Classification Problems: predict discrete-valued outputs.\\
+Regression Problems: predict continuous ie. real-valued outputs.
+
+\subsection{Linear Regression - Model and Cost Function}
+Model representation:
+\begin{enumerate}
+	\item m = number of training examples
+	\item x = input variables
+	\item y = output variables
+\end{enumerate}
+
+\subsubsection{Univariate Linear Regression Hypothesis}
+$$h_\theta = \theta_0 + \theta_1x$$
+Note that this is a function of input variable x.
+
+\subsubsection{Cost Function}
+Cost function ie. squared error function:  $$J(\theta_1, \theta_2) = \sum_{i=1}^{m}(h_\theta(x^{(i)})-y^{(i)})^2$$ Note that this is a function of the parameters \(\theta_1, \theta_2\). The goal is to minimize the cost function by tuning parameters \(\theta_1, \theta_2\). We have in the denominator a \(2m\) term to make the math cleaner, but having \(J\) without the 2 would yield the same result, as we are simply performing minimization. This cost function is the most common for regression problems.
+
+\subsubsection{Cost Function Intuition}
+We can use contour plots and surface plots in order to determine which values of \(\theta_1\) and \(\theta_2\) will cause a minimum of \(J(\theta_1, \theta_2)\).
+
+\subsection{Gradient Descent}
+Algorithm, given $J(\theta_0, \theta_1)$:
+\begin{itemize}
+	\item Start with some $\theta_0, \theta_1$
+	\item Keep changing  $\theta_0, \theta_1$ to reduce $J(\theta_0, \theta_1)$ until we hopefully end up at a (local) minimum
+\end{itemize}
+Mathematically, we repeat the following until convergence:
+	$$\theta_j := \theta_j - \alpha \frac{\partial}{\partial \theta_j} J(\theta_0, \theta_1)$$
+
+For linear regression:
+$$ \theta_0 := \theta_0 - \alpha \frac{1}{m}\sum_{i=1}^{m}(h_\theta( x^{(i)})-y^{(i)}) $$
+
+$$ \theta_1 := \theta_1 - \alpha \frac{1}{m}\sum_{i=1}^{m}(h_\theta( x^{(i)})-y^{(i)}) x^{(i)}$$
+
+"Batch" Gradient Descent - each step of the gradient descent uses all the training examples. Not the only form.
+
+where $\alpha$ is the learning rate, (the size of the step taken).
+
+Updates must occur simultaneously (do not use latest value of $\theta_0$ to find $\theta_1$).
+
+\subsubsection{Intuition}
+\begin{enumerate}
+	\item small \(\alpha\) makes process slow 
+	\item large \(\alpha\) makes gradient descent overshoot the minimum - it may fail to converge or diverge
+	\item the learning rate does not need to be changed during gradient descent (smaller steps taken automatically by smaller derivative)
+\end{enumerate}
+
+\section{Week 2}
+
+\subsection{Multivariate Linear Regression}
+\subsubsection{Multiple Features}
+\begin{itemize}
+	\item n = number of features
+	\item $x^{(i)}$ = input (features) of $i^{th}$ training example
+	\item $x_j^{(i)}$ = value of feature j in the $i^{th}$ training example
+\end{itemize}
+$$h_\theta = \theta_0 + \theta_1x_1 + ... + \theta_n x_n = \theta^Tx$$
+
+For convenience, $x_0 = 1$, such that $x$ can be treated as a vector of size n + 1. The parameters are stored in a vector $\theta$ which is also of that size.
+
+\subsubsection{Gradient Descent for Multiple Variables ($n \geq 1$)}
+
+$$ \theta_j := \theta_j - \alpha \frac{1}{m}\sum_{i=1}^{m}(h_\theta(x^{(i)}) -y^{(i)}) x_j^{(i)}$$
+
+\subsubsection{Feature Scaling}
+Get every feature into approximately a $-1 \leq x_i \leq 1$ range; makes gradient descent converge faster (makes contour plots less skewed)\\
+Mean normalization: replace $x_i$ with $x_i - \mu_i$ to make features have approximately zero mean (do not apply to $x_0$) $$x_j = \frac{x_j - \mu}{\sigma}$$
+Instead of using $\sigma$, can use range instead.
+
+\subsubsection{Learning Rate}
+There is a learning rate at which $J(\theta)$ will monotonically decrease (ie decrease for each iteration). Debug algorithm by plotting $J(\theta)$ vs. number of iterations.
+Symptoms of a learning rate that is too large are: divergence, $J(\theta)$ that decreases and then increases repeatedly (looks like $-|sin(x)| + c$).
+
+\subsubsection{Polynomial Regression}
+Nonlinear polynomial regression can be done via substitution of a $x^n$ term to a $x$ term. Feature scaling becomes increasingly important. The range used in feature scaling must change accordingly (eg. range from 1-100 for an x term becomes 1-10,000 for an $x^2$ term).
+
+\subsection{Computing Parameters Analytically - Normal Equation}
+Using calculus, we take partial derivative of J with respect to the parameters $\theta$ allows for minimization of J with respect to the parameters.
+$$\theta = (X^TX)^{-1}X^Ty$$
+X is the 'design matrix' and is of size $m \times (n+1)$. The first column of X is a vector of 1's. Each column thereafter contains the $j^{th}$ feature of a given data point $x^i$. In other words, each row is just a 1 followed by the x-values associated with a given data point. The column vector $y$ contains the output values, and is $m \times 1$ in size. 
+
+Feature scaling is not necessary for the normal equation method.
+
+\subsubsection{Gradient Descent vs Normal Equation}
+Gradient descent requires iterations and a learning rate, and works well even when $n$ (the number of features) is large. The normal equation method becomes slow when n is very large, as $X^TX$ is an $n \times n$ matrix whose inversion is slow. For $n \geq 10,000$, opt for gradient descent.
+
+\subsubsection{Normal Equation Non-invertibility}
+Two causes:
+\begin{enumerate}
+	\item Redundant features (linearly dependent features)
+	\item Too many features ie. $ m \leq n $ such that too little data is available to fit all those features (results in non-invertible/singular matrix)
+	\item (solution is to delete some features or to use regularization)
+\end{enumerate}
+
+\subsection{Vectorization of Implementation}
+User-defined iterating routines are likely slower than library calls which are vectorized implementations. Example: performing dot product as matrix multiplication is faster than performing it via a summing for-loop. A vectorized implementation of gradient descent:
+
+$$ \theta := \theta - \alpha \delta $$ where $\theta$ and $\delta$ are size $n+1$ column vectors, and 
+$$ \delta = \frac{1}{m}\sum_{i=1}^{m}(h_\theta(x^{(i)}) - y^{(i)})x^{(i)} $$ where $x^{(i)}$ is a size $n+1$ column vector and $(h_\theta(x^{(i)}) - y^{(i)})$ is a real number.
+
+\section{Week 3}
+\subsection{Classification}
+$ y \epsilon \{0, 1\}$, where 0 is the negative class, and 1 is the positive class.\\
+Logistic Regression: classification algorithm that enforces $ 0 \leq h_\theta(x) \leq 1$
+\subsubsection{Hypothesis Representation}
+$h_\theta(x) = \frac{1}{1 + e^{-\theta^Tx}} = P(y = 1| x; \theta)$\\
+It is based on the Sigmoid/logistic function: $g(z) = \frac{1}{1 + e^{-z}} $
+The output of the hypothesis is the probability that y = 1 given an input x that is parameterized by $\theta$.\\
+
+\subsubsection{Decision Boundary}
+Given a boundary (like predict 1 when $h(x)$ is greater than 0.5 and otherwise 0), it is easy to solve for the boundary value of $\theta^Tx$. From there, it is easy to determine the values of $x_i$ that result in a given outcome in terms of an inequality.
+
+\subsection{Logistic Regression Model}
+\subsubsection{Cost Function}
+Since $h(x)$ is now a nonlinear function, using the cost function as previously defined would result in several local minimia, therefore it is unlikely for gradient descent to achieve the global minimum, which is only guaranteed to occur for convex functions. The following cost function gives us a convex cost function that is local minimum free, and is derived from the principle of maximum likelihood estimation (stats concept):
+ 
+
+$$ J(\theta) = \frac{1}{m} Cost(h_\theta(x^{(i)}),y^{(i)}) $$
+\[ 
+Cost(h_\theta(x),y) =
+\begin{cases}
+      -log(h_\theta(x)) & \textrm{if } y = 1\\
+      -log(1 - h_\theta(x)) & \textrm{if } y = 0
+\end{cases}
+= -ylog(h_\theta(x)) - (1-y)log(1-h_\theta(x))
+\]
+
+\subsubsection{Gradient Descent}
+Again, use gradient descent to minimize cost function, and the update rule is identical to linear regression once partial derivatives of J are taken.
+$$\theta_j := \theta_j - \alpha \frac{\partial}{\partial \theta_j} J(\theta_0, \theta_1)$$
+
+However, the definition of $h_\theta(x)$ is now based on the sigmoid function rather than a polynomial. Use vectorized implementation using $\theta$ as a vector of the parameters and update them simultaneously:
+
+$$\theta := \theta - \alpha \frac{1}{m}[\sum_{i=1}^{m}( h_\theta(x^{(i)})-y^{(i)}) \cdot x^{(i)}] $$
+
+Can also use feature scaling make logistic regression run faster.
+
+\subsection{Advanced Optimization}
+Optimization algorithms to minimize $J(\theta)$:
+\begin{enumerate}
+	\item Gradient Descent
+	\item Conjugate Gradient
+	\item BFGS
+	\item L-BFGS
+\end{enumerate}
+The latter algorithms require no manual picking of $\alpha$ and often arrive at a solution much faster than gradient descent would. However, they are more complex. Use the fminunc (unconstrained minimization) function in MATLAB. You must write a function that computes the cost function given some $\theta$ vector and computes a vector known as the 'gradient' which stores the partial derivatives of J with respect to the parameters $\theta_i$.
+
+\subsection{Multi-class Classification (any number of outputs)}
+One-vs-all (one-vs-rest) classification: given k classes, train k logistic regression classifiers where all data not in the $k^{th}$ class is considered as being in the negative class. $h_\theta^{(i)}(x) = P(y = i | x;\theta) \textrm{ for each class } (i = 1,2 .. k)$ . To classify a unknown input $x$, pick the class $i$ that maximizes $h_\theta^{(i)}(x)$. In other words, pick the classifier which thinks most enthusiastically that the new data point fits into that class.
+
+\subsection{The Problem of Over-fitting}
+Fitting data that appears to follow a square root function with a straight line is said to produce an output that is 'underfit' and has 'high bias'. The algorithm has a preconception that the data should be linear.\\
+Fitting the same data with a quartic polynomial may result in all training examples being passed through well, but the algorithm has 'overfit' the data and has 'high variance'. We don't have enough data to constrain this high order polynomial.\\
+Overfitting: the algorithm makes accurate predictions for examples in the training set (the cost function approaches 0), but it does not generalize well to make accurate predictions on new, previously unseen examples due to too many features and not enough data.
+\subsubsection{Addressing Overfitting}
+\begin{enumerate}
+	\item Reduce number of features (either manually or through model selection algorithm)
+	\item Regularization
+\end{enumerate}
+
+\subsubsection{Regularization}
+Penalize parameters $\theta_1 ... \theta_n$  to make them very small - modify cost function as follows:
+$$ J(\theta) = \frac{1}{2m}[\sum_{i=1}^{m}(h_\theta(x^{(i)}) - y^{(i)})^2 + \lambda \sum_{j=1}^{n}\theta_j^2] $$ where $\lambda$ is the regularization parameter.
+
+The result is a simpler hypothesis that is less prone to overfitting, as minimizing this function results in much smaller $\theta$ values. The left half satisfies the goal of fitting the training set, and the right half satisfies the goal of keeping parameters small. If $\lambda$ is too large, then under-fitting will occur as essentially $\theta_0$ will remain in the hypothesis, with very small contributions from the other parameters.
+
+\subsubsection{Regularized Linear Regression}
+For gradient descent, repeat:
+$$ \theta_0 := \theta_0 - \alpha \frac{1}{m}\sum_{i=1}^{m}(h_\theta( x^{(i)})-y^{(i)})x_0^{(i)} $$
+
+$$ \theta_j := \theta_j(1-\alpha \frac{\lambda}{m}) - \alpha \frac{1}{m}\sum_{i=1}^{m}(h_\theta( x^{(i)})-y^{(i)}) x_j^{(i)} \textrm{ for } (j=0,1,2,3,...,n)$$
+
+For the normal equation:
+$$\theta = (X^TX + \lambda I')^{-1}X^Ty $$ where $I'$ is the identity matrix with size $(n+1) \times (n+1)$ where the top left entry is 0. Using regularization with $\lambda \textgreater 0$ makes $X^TX$ always invertible.
+
+\subsubsection{Regularized Logistic Regression}
+For gradient descent, repeat (same as linear regression) :
+$$ \theta_0 := \theta_0 - \alpha \frac{1}{m}\sum_{i=1}^{m}(h_\theta( x^{(i)})-y^{(i)})x_0^{(i)} $$
+
+$$ \theta_j := \theta_j(1-\alpha \frac{\lambda}{m}) - \alpha \frac{1}{m}\sum_{i=1}^{m}(h_\theta( x^{(i)})-y^{(i)}) x_j^{(i)} \textrm{ for } (j=0,1,2,3,...,n)$$
+ 
+The partial derivatives are now:
+$$ \frac{\partial}{\partial \theta_j}J(\theta) = \frac{1}{m}\sum_{i=1}^{m}(h_\theta( x^{(i)})-y^{(i)})x_j^{(i)} + \frac{\lambda}{m	}\theta_j $$
+
+\section{Week 4}
+\subsection{Neural Networks}
+\subsubsection{Model Representation}
+Neuron model - logistic unit: based on sigmoid (logistic) activation function. "Parameters" $\theta$ can also be known as "weights". We often omit the $x_0$ (bias unit) because its value is always 1.\\
+Neuron network: neurons strung together. 
+
+Layers:
+\begin{enumerate}
+	\item Layer 1: input layer - x value
+	\item Layer 2: hidden layer - values you don't observe in the training set (could be more than jut one layer; there can also be a bias unit here)
+	\item Layer 3: output layer - y value
+\end{enumerate}
+
+Terminology:
+\begin{enumerate}
+	\item $a_i^{(j)}$: "activation" of unit $i$ in layer $j$, where "activation" means the output value?
+	\item $\theta^{(j)}$: matrix of weights controlling function mapping from layer $j$ to layer $j+1$.
+\end{enumerate}
+
+If a network has $s_j$ units in layer $j$, $s_{j+1}$ units in layer $j+1$, then $\theta^{(j)}$ will be of dimension $s_{j+1} \times (s_j + 1).$ These units do not include the bias unit.
+
+Forward propagation (vectorized implementation): You're basically just using logistic regression to get an output from the last hidden layer to the output layer, but instead of using the inputs you're using the activations. The activations (in the hidden layers) are learned as a function of the input. You're no longer constrained to just using the features provided, and can have complex nonlinear hypotheses.
+
+\subsection{Applications}
+Digital logic can be computed given that the sigmoid function reaches 0.99 at 4.6 and 0.01 at -4.6. These can be rounded to binary values of 1 and 0. You can write mathematical functions that then just output values greater than these tolerances to make pseudo digital logic. XNOR is computed by ORing the AND of two inputs with the NAND of two inputs. This requires one hidden layer.
+
+\subsubsection{Multiclass Classification}
+Example: Handwritting detection\\
+Extension of one-vs-all method. In the training set $x^{(m)}, y^{(m)}$, represent $y^{(m)}$ as a column vector of size equivalent to the number of classes. The values in the vector are 0 for all classes except the class to which the data point belongs. Likewise, the output $h_\theta (x)$ is a vector of similar size and characteristics. However, the values will be approximately 0 or 1, not necessarily exact due to the asymptotic nature of the sigmoid function.
+\end{document}
