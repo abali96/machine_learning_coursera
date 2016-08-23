@@ -1,6 +1,7 @@
 \documentclass[11pt,letterpaper]{article}
 %\usepackage[left=1in, top=1in, bottom=1in]{geometry}
 \usepackage{amsmath}
+\usepackage{amsfonts}
 \usepackage{listings}
 \usepackage{graphicx}
 \begin{document}
@@ -212,8 +213,10 @@ Layers:
 
 Terminology:
 \begin{enumerate}
-	\item $a_i^{(j)}$: "activation" of unit $i$ in layer $j$, where "activation" means the output value?
+	\item $a_i^{(j)}$: "activation" of unit $i$ in layer $j$, where "activation" means the output value
 	\item $\theta^{(j)}$: matrix of weights controlling function mapping from layer $j$ to layer $j+1$.
+	\item L = total number of layers in network
+	\item K = number of output units (for multi-class classification problems this is the number of classes)
 \end{enumerate}
 
 If a network has $s_j$ units in layer $j$, $s_{j+1}$ units in layer $j+1$, then $\theta^{(j)}$ will be of dimension $s_{j+1} \times (s_j + 1).$ These units do not include the bias unit.
@@ -224,6 +227,127 @@ Forward propagation (vectorized implementation): You're basically just using log
 Digital logic can be computed given that the sigmoid function reaches 0.99 at 4.6 and 0.01 at -4.6. These can be rounded to binary values of 1 and 0. You can write mathematical functions that then just output values greater than these tolerances to make pseudo digital logic. XNOR is computed by ORing the AND of two inputs with the NAND of two inputs. This requires one hidden layer.
 
 \subsubsection{Multiclass Classification}
-Example: Handwritting detection\\
+Example: Handwriting detection\\
 Extension of one-vs-all method. In the training set $x^{(m)}, y^{(m)}$, represent $y^{(m)}$ as a column vector of size equivalent to the number of classes. The values in the vector are 0 for all classes except the class to which the data point belongs. Likewise, the output $h_\theta (x)$ is a vector of similar size and characteristics. However, the values will be approximately 0 or 1, not necessarily exact due to the asymptotic nature of the sigmoid function.
+
+\section{Week 5}
+\subsection{Neural Network Cost Function}
+Expands on regularized logistic regression cost function.
+
+
+$$ J(\theta) = -\frac{1}{m}[\sum_{i=1}^{m} \sum_{k=1}^{K}  y_k^{(i)}log(h_\theta(x^{(i)}))_k + (1-y_k^{(i)})log(1-h_\theta(x^{(i)}))_k + \frac{\lambda}{2m} \sum_{l=1}^{L-1}\sum_{i=1}^{s_l}\sum_{j=1}^{s_{l+1}}  (\theta_{ji}^{(l)})^2] $$
+
+The hypothesis $ h_\theta (x) \epsilon \mathbb{R}^K $ and $ (h_ \theta (x))_i = i^{th} output $. \\
+
+We do not sum over the $\theta$ terms where $i=0$ because those multiply into the bias units - we don't want to regularize them.
+
+\subsubsection{Gradient Computation}
+In order to minimize the cost function using an algorithm like gradient descent, we need to compute the gradient of J. Given one training example $(x,y)$, we start with forward propagation. A vectorized implementation where there are 2 hidden layers (total 4 layers):
+
+$$ a^{(1)} = x $$
+$$ z^{(2)} = \theta^{(1)}a^{(1)} $$
+$$ a^{(2)} = g(z^{(2)}) $$
+$$ \textrm{ add } a_0^{(2)} \textrm{ bias unit } $$
+$$ z^{(3)} = \theta^{(2)}a^{(2)} $$
+$$ a^{(3)} = g(z^{(3)}) $$
+$$ \textrm{add } a_0^{(3)} \textrm{ bias unit } $$
+$$ z^{(4)} = \theta^{(3)}a^{(3)} $$
+$$ a^{(4)} = h_\theta(x) = g(z^{(4)}) $$
+
+Now we do back propagation:
+
+Define $\delta_j^{(l)} = $ = "error" of node $j$ in layer $l$ (based on its activation). There is no $\delta^{(1)}$ because the input layer has no error associated with it. Depending on the implementation, the $\delta$ values corresponding to the bias units ($\delta_0^{(l)}$) can be meaningless as we generally don't change the value of +1 assigned to the bias units.
+Formally, $\delta_j^{(l)} = \frac{\partial}{\partial z_j^{(l)}}cost(i)$
+
+$$ \delta^{(4)} = a^{(4)} - y $$ where each value is a vector of size equal to the number of outputs.
+$$ \delta^{(3)} = (\theta^{(3)})^T\delta^{(4)} .\times g'(z^{(3)}) $$
+$$ == $$
+$$ \delta^{(3)} = a^{(3)} .\times (1-a^{(3)}) $$
+\\
+$$ \delta^{(3)} = (\theta^{(2)})^T\delta^{(3)} .\times g'(z^{(2)}) $$
+$$ == $$
+$$ \delta^{(2)} = a^{(2)} .\times (1-a^{(2)}) $$
+
+$$\frac{\partial}{\partial \theta_{ij}^{(l)}}J(\theta) = a_j^{(l)}\delta_i^{(l+1)} $$ if we set $\lambda = 0 $.
+
+Formally, given training set ${(x^{(1)}, y^{(1)}),..., (x^{(m)}, y^{(m)})}$:
+\begin{enumerate}
+	\item  Set $\triangle_{ij}^{(l)} = 0$ for all $l, i, j$.
+	\item For i = 1 to m:
+	\begin{enumerate}
+		\item Set $a^{(1)} = x^{(i)}$
+		\item Perform forward prop to compute $a^{(l)} for l = 2,3,...L$
+		\item Using $y^{(i)}$, compute $\delta^{(L)} = a^{(L)} - y^{(i)}$
+		\item Compute $\delta^{(L - 1)}, \delta^{(L - 2)},..., \delta^{(2)}$
+		\item $\triangle_{ij}^{(l)} = \triangle_{ij}^{(l)} + a_{j}^{(l)} \delta_{i}^{(l+1)}$ == $\triangle^{(l)} = \triangle^{(l)} + \delta^{(l+1)}(a^{(l)})^T $ 
+	\end{enumerate}
+	\item $ D_{ij}^{(l)} = \frac{1}{m} \triangle_{ij}^{(l)} + \lambda \theta_{ij}^{(l)}$ if $j \neq 0$
+	\item $ D_{ij}^{(l)} = \frac{1}{m} \triangle_{ij}^{(l)} $ if $j = 0$
+\end{enumerate}
+
+$$ \frac{\partial}{\partial \theta_{ij}^{(l)}}J(\theta) =  D_{ij}^{(l)} $$
+
+
+\subsubsection{Intuition on Back Propagation}
+https://www.coursera.org/learn/machine-learning/lecture/du981/backpropagation-intuition
+
+\subsection{Back Propagation in Practice}
+Using advanced optimization algorithms like fminunc in MATLAB requires use of initial guess and gradient in the form of size $n + 1$ vectors. With a neural network, we now deal with $\theta$ and gradient $D$ matrices that must be unrolled into vectors.
+
+Learning algorithm (given L = 4):
+\begin{enumerate}
+	\item Have initial parameters $\theta^{(1)}, \theta^{(2)}, \theta^{(3)}$
+	\item Unroll to get initialTheta to pass to fminunc(@costFunction, initialTheta, options) using [Theta1(:); Theta2(:), Theta3(:)]
+	\item function [jval, gradientVec] = costFunction(thetaVec)
+	\begin{enumerate}
+		\item From thetaVec, get $\theta^{(1)}, \theta^{(2)}, \theta^{(3)}$ using reshape command
+		\item Use forward/backward propagation to compute $D^{(1)}, D^{(2)}, D^{(3)}$ and $J(\theta)$
+		\item Unroll $D^{(1)}, D^{(2)}, D^{(3)}$ and $J(\theta)$ to get gradientVec
+	\end{enumerate}
+\end{enumerate}
+
+\subsubsection{Gradient Checking}
+Even with subtle bugs, neural networks can seem like they're working in that the cost function continues to be minimized. But in reality, they do not necessarily find the minimum. Gradient checking is a means of detecting such bugs.
+
+Use a central difference to numerically approximate the gradient, using a step of $10^{-4}$.
+
+Given parameter unrolled vector $\theta$:
+$$\frac{\partial}{\partial \theta_n} J(\theta) \approx \frac	{J(\theta_1, \theta_2,...\theta_n + \epsilon) - J(\theta_1,\theta_2,...\theta_n - \epsilon)}{2\epsilon} $$
+Code:
+\begin{lstlisting}
+	for i = 1:n
+		thetaPlus = theta;
+		thetaPlus(i) = thetaPlus(i) + EPSILON;
+		thetaMinus = theta;
+		thetaMinus(i) = thetaMinus(i) - EPSILON;
+		gradientApproximation(i) = (J(thetaPlus) − J(thetaMinus)) / (2 * EPSILON);
+	end
+\end{lstlisting}
+Recall that back propagation generates DVec (which are the same partial derivatives of the cost function with respect to our params). Compare our numerically computed derivatives with the DVec value. If these two ways give similar answers (up to a few decimals), our implementation of back prop is likely correct. When actually using back prop for training the classifiers, turn off gradient checking as it is computationally expensive.
+
+\subsubsection{Initialization of $\theta$ Parameters}
+Initializing $\theta_{ij}^{(l)}$ to be 0 does not work like in regression. After each update, the parameters corresponding to the inputs going into each of the hidden units are equal to each other even through iteration of gradient descent. This limits what kind of functions the neural network can compute. This problem is called symmetric weighting.\\
+Use random initialization to allow for symmetry breaking. Initialize each $\theta_{ij}^{(l)}$ to a (different) random value in $[-\epsilon, \epsilon]$ where $\epsilon$ is some value.
+
+\subsection{Putting it all Together}
+Training a NN:
+\begin{enumerate}
+	\item Pick a network architecture (connectivity pattern)
+	\item Number of input units = dimension of features $x^{(i)}$
+	\item Number of output units = number of classes
+	\item Reasonable Default: use 1 hidden layer (most common), or if you have more than one hidden layer, have the same number of hidden units in every layer (usually the more the better but more expensive) and comparable to the number of inputs or some multiple of it?
+	\item Randomly initialize weights to small values near 0
+	\item Implement forward propagation to get $h_\theta(x^{(i)}$ for any $x^{(i)}$
+	\item Implement code to compute cost function $J(\theta)$
+	\item Implement back prop to compute partial derivatives $\frac{\partial}{\partial \theta_{jk}^{(l)}}J(\theta)$
+	\item Use a for loop, iterating of training examples, performing forward prop and backward prop on each training example $(x^{(i)}, y^{(i)}$ to get $a^{(l)}$ and $\delta^{(l)}$ terms for $l=2,...,L$. In the for loop, compute $\triangle^{(l)} = \triangle^{(l)} + \delta^{(l+1)}(a^{(l)})^T$
+	\item Outside the for loop, compute partial derivatives of J, taking into account regularization term $\lambda$.
+	\item Use gradient checking to compare gradients computed using back prop vs. a numerical estimate using central differences of J
+	\item Disable gradient checking
+	\item Use gradient descent or advanced optimization method with back prop (which computes the partial derivatives) to try to minimize J as a function of parameters $\theta$. Note that J is non-convex in this case, so you're not guaranteed to get a global optimum. Local optima tend to be good enough though.
+\end{enumerate}
+Idealized output $y$ is a column vector with a 1 in one row and zeros in all the rest.
+
+
+
 \end{document}
