@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.16 (TeX Live 2015) (preloaded format=pdflatex 2015.10.11)  22 AUG 2016 22:44
+This is pdfTeX, Version 3.14159265-2.6-1.40.16 (TeX Live 2015) (preloaded format=pdflatex 2015.10.11)  24 AUG 2016 15:13
 entering extended mode
  restricted \write18 enabled.
  file:line:error style messages enabled.
@@ -281,7 +281,17 @@ Overfull \hbox (244.44629pt too wide) in paragraph at lines 323--324
 [][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][] 
  []
 
-[13] [14] (/Users/abali/Drive/Code/ml_coursera/.texpadtmp/Machine Learning Notes.aux) ) 
+[13] [14]
+Overfull \hbox (12.7034pt too wide) in paragraph at lines 372--379
+[]$\OML/cmm/m/it/10.95 err\OT1/cmr/m/n/10.95 (\OML/cmm/m/it/10.95 h[]\OT1/cmr/m/n/10.95 (\OML/cmm/m/it/10.95 x\OT1/cmr/m/n/10.95 )\OML/cmm/m/it/10.95 ; y\OT1/cmr/m/n/10.95 ) = [] [] 
+ []
+
+[15]
+Overfull \hbox (13.9886pt too wide) in paragraph at lines 386--389
+\OT1/cmr/m/n/10.95 Good fits will have in-ter-me-di-ate train-ing er-ror and in-ter-me-di-ate cross-validation
+ []
+
+[16] [17] (/Users/abali/Drive/Code/ml_coursera/.texpadtmp/Machine Learning Notes.aux) ) 
 Here is how much of TeX's memory you used:
  3385 strings out of 494501
  48423 string characters out of 6167029
@@ -289,12 +299,12 @@ Here is how much of TeX's memory you used:
  6626 multiletter control sequences out of 15000+600000
  11352 words of font info for 43 fonts, out of 8000000 for 9000
  319 hyphenation exceptions out of 8191
- 37i,9n,32p,553b,856s stack positions out of 5000i,500n,10000p,200000b,80000s
+ 37i,10n,32p,681b,856s stack positions out of 5000i,500n,10000p,200000b,80000s
 </usr/local/texlive/2015basic/texmf-dist/fonts/type1/public/amsfonts/cm/cmbx10.pfb></usr/local/texlive/2015basic/texmf-dist/fonts/type1/public/amsfonts/cm/cmbx12.pfb></usr/local/texlive/2015basic/texmf-dist/fonts/type1/public/amsfonts/cm/cmex10.pfb></usr/local/texlive/2015basic/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi10.pfb></usr/local/texlive/2015basic/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi6.pfb></usr/local/texlive/2015basic/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi8.pfb></usr/local/texlive/2015basic/texmf-dist/fonts/type1/public/amsfonts/cm/cmr10.pfb></usr/local/texlive/2015basic/texmf-dist/fonts/type1/public/amsfonts/cm/cmr12.pfb></usr/local/texlive/2015basic/texmf-dist/fonts/type1/public/amsfonts/cm/cmr17.pfb></usr/local/texlive/2015basic/texmf-dist/fonts/type1/public/amsfonts/cm/cmr6.pfb></usr/local/texlive/2015basic/texmf-dist/fonts/type1/public/amsfonts/cm/cmr8.pfb></usr/local/texlive/2015basic/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy10.pfb></usr/local/texlive/2015basic/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy6.pfb></usr/local/texlive/2015basic/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy8.pfb></usr/local/texlive/2015basic/texmf-dist/fonts/type1/public/amsfonts/symbols/msbm10.pfb>
-Output written on "/Users/abali/Drive/Code/ml_coursera/.texpadtmp/Machine Learning Notes.pdf" (14 pages, 193859 bytes).
+Output written on "/Users/abali/Drive/Code/ml_coursera/.texpadtmp/Machine Learning Notes.pdf" (17 pages, 203746 bytes).
 PDF statistics:
- 110 PDF objects out of 1000 (max. 8388607)
- 78 compressed objects within 1 object stream
+ 119 PDF objects out of 1000 (max. 8388607)
+ 84 compressed objects within 1 object stream
  0 named destinations out of 1000 (max. 500000)
  1 words of extra memory for PDF output out of 10000 (max. 10000000)
 

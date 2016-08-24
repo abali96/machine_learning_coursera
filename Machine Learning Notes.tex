@@ -348,6 +348,50 @@ Training a NN:
 \end{enumerate}
 Idealized output $y$ is a column vector with a 1 in one row and zeros in all the rest.
 
+\section{Week 6}
+If the hypothesis is not very good at making predictions on new data, there are some options:
+\begin{enumerate}
+	\item Getting more training examples (fixes high variance problems)
+	\item Trying a smaller set of features (choosing them more carefully to prevent overfitting) (fixes high variance)
+	\item Getting additional features (fixes high bias)
+	\item Try adding polynomial features (fixes high bias)
+	\item Decreasing $\lambda$ for regularization (fixes high bias)
+	\item Increasing $\lambda$ for regularization (fixes high variance)
+\end{enumerate}
 
+Don't waste time using gut feelings to pick a learning algorithm. Use a machine learning diagnostic: a test you can run to gain insight into what is or isn't working with a learning algorithm, and gain guidance as to how to best improve its performance.
+\subsection{Evaluating a Learning Algorithm}
+\subsubsection{Evaluating Hypothesis}
+You can plot in 2D to check for overfitting, but you can't do this with more features. Solution: split your training data into two sets: the training set, and the test set. The training set should contain a random 70\% of your training data, and the test set should contain the balance 30\%. Learn the parameters $\theta$ from the training set (ie. run minimization on J($\theta$), then compute the test set error.
+For linear regression, this means we compute (note no regularization):
+$$ J_{test}(\theta) = \frac{1}{2m_{test}} \sum_{i=1}^{m_{test}}(h_\theta(x_{test}^{(i)}) - y_{test}^{(i)})^2 $$
+For logistic regression, we compute: 
+$$ J_{test}(\theta) = -\frac{1}{m_{test}} \sum_{i=1}^{m_{test}}y_{test}^{(i)}log h_\theta(x_{test}^{(i)}) + (1-y_{test}^{(i)})log h_\theta (x_{test}^{(i)}) $$
+Or, we can use a number that's easier to understand - the 0/1 misclassification error which is just the ratio of how many are classified correctly vs incorrectly.
 
+\( err(h_\theta(x), y) =
+\begin{cases}
+      1 & \textrm{if } h_\theta(x) \geq 0.5 \textrm{ and } y = 0, \textrm{ or if } h_\theta(x) < 0.5 \textrm { and } y = 1\\
+      0 & \textrm{otherwise}
+\end{cases} \\
+\textrm{Test error} = \frac{1}{m	_{test}} \sum_{i=1}^{m_{test}}err(h_\theta(x_{test}^{(i)}), y_{test}^{(i)})
+\)
+
+\subsubsection{Model Selection - How to Choose the Degree of Polynomial to Fit}
+Take another parameter, the degree of the polynomial, $d$, (in addition to the $\theta$ parameters) that we must determine. Take each model, fit it to the training set, and compute the test set error, and pick the one with the lowest test set error. But how well does this model generalize? We picked the value of $d$ that gave us the best possible performance on the test set is likely to be an overly optimistic estimate of generalization error. Because we fit the parameter $d$ based on the test set, it is no longer fair to evaluate the hypothesis on this test set. (You can't report the generalization error accurately by using the test set.) \\
+Solution: use 60\% of data as training set, 20\% as cross-validation set, and 20\% as the test set. Compute $J(\theta)$ for each of the sets. Minimize $J(\theta)$ w.r.t. $\theta$ for each degree of model. Compute the cross-validation set error, and pick the hypothesis with the lowest cross-validation error. Now, estimate the generalization error using the test set error.
+
+\subsection{Bias vs. Variance}
+\subsubsection{Diagnosing Bias vs Variance}
+Low degree polynomials result in high training error and high cross validation error ($J_{cv}(theta) \approx J_{train}(\theta))$. This is an underfitting/high bias problem.\\
+High degree polynomials result in low training error and high cross validation error ($J_{cv}(\theta) >> J_{train}(\theta))$. This is a overfitting/high variance problem.\\
+Good fits will have intermediate training error and intermediate cross-validation error.
+\subsubsection{Auto-selecting $\lambda$}
+Have some range of $\lambda$ you want to fit, and increment in multiples of 2 (0, 0.01, 0.02, 0.04...). For each, minimize the cost function $J(\theta)$ (which includes the regularization term) to solve for the parameter vector $\theta$. In this case, we define separately $J_{train}, J_{cv}, J_{test}$ to not include the regularization term. Use the cross-validation set fit with the different parameter vectors, and compute the cross-validation error. Pick the one with the smallest cross-validation error. Report the test set error as $J_{test})$ as a measure of how well the model will generalize. \\
+Consider $J_{train}$ and $J_{cv}$ (the ones without regularization). Low $\lambda$ results in overfitting (high variance) and thus low $J_{train}$ and high $J_{cv}$. Large $\lambda$ results underfitting (high bias) and thus high $J_{train}$ and high $J_{cv}$. Intermediate values of $\lambda$ result in intermediate $J_{train}$ and small $J_{cv}$. Plotting these allows for confidence in picking $\lambda$.
+\subsubsection{Learning Curves}
+High bias problems (low degree polynomial): as you increase the training set size, $J_{cv}$ decreases up to a certain point but plateau's relatively quickly. $J_{train}$ will increase up to a certain point and plateau. Both are high values and are approximately the same. Getting more training data will not, by itself,   help much.\\
+High variance problems (high degree polynomial with small $\lambda$): as you increase the training set size, the training set error increases as it becomes harder to fit lots of data points. Cross-validation error decreases as you increase the training set size. There is a large gap because the training error and cross-validation error. The two curves converge to one another, so getting more training data is likely to help - cross validation error will continue to go down, which is good.
+\subsubsection{Relating to Neural Networks}
+Small networks have fewer parameters - they are cheaper but prone to underfitting. Large networks have more parameters (either through more hidden layers or more units in a given hidden layer) - they are more expensive and are more computationally expensive. Use regularization to deal with overfitting. To pick the number of layers, you can use training, cross-validation, and test sets, and see which performs best on the cross-validation set.
 \end{document}
