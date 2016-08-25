@@ -383,7 +383,7 @@ Solution: use 60\% of data as training set, 20\% as cross-validation set, and 20
 
 \subsection{Bias vs. Variance}
 \subsubsection{Diagnosing Bias vs Variance}
-Low degree polynomials result in high training error and high cross validation error ($J_{cv}(theta) \approx J_{train}(\theta))$. This is an underfitting/high bias problem.\\
+Low degree polynomials result in high training error and high cross validation error ($J_{cv}(\theta) \approx J_{train}(\theta))$. This is an underfitting/high bias problem.\\
 High degree polynomials result in low training error and high cross validation error ($J_{cv}(\theta) >> J_{train}(\theta))$. This is a overfitting/high variance problem.\\
 Good fits will have intermediate training error and intermediate cross-validation error.
 \subsubsection{Auto-selecting $\lambda$}
@@ -394,4 +394,29 @@ High bias problems (low degree polynomial): as you increase the training set siz
 High variance problems (high degree polynomial with small $\lambda$): as you increase the training set size, the training set error increases as it becomes harder to fit lots of data points. Cross-validation error decreases as you increase the training set size. There is a large gap because the training error and cross-validation error. The two curves converge to one another, so getting more training data is likely to help - cross validation error will continue to go down, which is good.
 \subsubsection{Relating to Neural Networks}
 Small networks have fewer parameters - they are cheaper but prone to underfitting. Large networks have more parameters (either through more hidden layers or more units in a given hidden layer) - they are more expensive and are more computationally expensive. Use regularization to deal with overfitting. To pick the number of layers, you can use training, cross-validation, and test sets, and see which performs best on the cross-validation set.
+
+\subsection{Spam Classifier}
+There are many ways to develop what features to use. One way is to take most frequently occurring $n$ words (10k-50k) in the training set, and those become the features. 
+\subsubsection{Error Analysis}
+Recommended approach to developing an ML algorithm:
+\begin{enumerate}
+	\item Start with a simple algorithm that you can implement quickly (like 24 hours). Implement it and test it on your cross-validation data.
+	\item Plot learning curves to decide if more data, more features, etc. are likely to help
+	\item Error analysis: manually example the examples (in the cross-validation set) that your algorithm made errors on. See if you spot any systematic trend in what type of examples it is making errors on.
+\end{enumerate}
+It is useful to have a numerical evaluation method that gives a single real-value to benchmark versions of the algorithm against others. Use the cross-validation error for this.
+\subsection{Handling Skewed Data}
+Skewed classes: when the ratio of positive to negative examples is very close to one of the extremes. For example, having 1\% test error on cancer prediction isn't so great when only 0.5\% of examples actually have cancer. Just always predicting that no one has cancer would actually get you better 'accuracy' by the error metric, although this would be a bad algorithm for prediction. Therefore we need a new error metric.
+\subsubsection{Precision/recall}
+Accuracy = $\frac{\textrm{True positives + True negatives}}{\textrm{Total examples}}$\\
+Precision = $\frac{\textrm{True positives}}{\textrm{True positives + False positives == Predicted positives}}$\\
+Recall = $\frac{\textrm{True positives}}{\textrm{True positives + False negatives == Actual positives}}$\\
+Higher values are better for both. 'Positive' is defined in terms of presence of the rarer class that we want to detect. These metrics handle skewed classes.
+\subsubsection{Trading Off Precision and Recall}
+For most classifiers, there is a tradeoff between precision and recall. In logistic regression, we predict 1 if $h_\theta(x) \geq \textrm{ threshold }$ and predict 0 otherwise. Higher thresholds cause higher precision (fewer false positives) and lower recall. Lower thresholds cause higher recall and lower precision. The tradeoff can be plotted.\\
+We want a single value to represent if the algorithm is good or bad. Standard way to combine them is the $F_1 \textrm{ score} = 2\frac{PR}{P+R}$. Measure P and R on the cross-validation set and choose the value of the threshold that maximizes $2\frac{PR}{P+R}$.
+\subsection{Using Large Data Sets}
+Large data rationale: use a linear algorithm with many parameters (e.g. logistic regression/linear regression with many features, or a NN with many hidden units). These are low bias algorithms, meaning $J_{train}(\theta)$ will be small. Using a very large training set with these algorithms means we will be unlikely to overfit, and hence exhibit low variance. Consequently, $J_{train}(\theta) \approx J_{test}(\theta)$ and hence $J_{test}(\theta)$ will be small. Therefore we will have a low bias and low variance algorithm.\\
+More data will not help when the features $x$ do not contain enough information to predict $y$ accurately, regardless of if we have a large number of hidden units or have simple algorithm. A useful test is: given the input $x$, can a human expert confidently predict $y$ based solely on the features $x$?
+
 \end{document}
