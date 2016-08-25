@@ -131,7 +131,7 @@ Given a boundary (like predict 1 when $h(x)$ is greater than 0.5 and otherwise 0
 Since $h(x)$ is now a nonlinear function, using the cost function as previously defined would result in several local minimia, therefore it is unlikely for gradient descent to achieve the global minimum, which is only guaranteed to occur for convex functions. The following cost function gives us a convex cost function that is local minimum free, and is derived from the principle of maximum likelihood estimation (stats concept):
  
 
-$$ J(\theta) = \frac{1}{m} Cost(h_\theta(x^{(i)}),y^{(i)}) $$
+$$ J(\theta) = \frac{1}{m} \sum_{i=1}^m Cost(h_\theta(x^{(i)}),y^{(i)}) $$
 \[ 
 Cost(h_\theta(x),y) =
 \begin{cases}
@@ -419,4 +419,73 @@ We want a single value to represent if the algorithm is good or bad. Standard wa
 Large data rationale: use a linear algorithm with many parameters (e.g. logistic regression/linear regression with many features, or a NN with many hidden units). These are low bias algorithms, meaning $J_{train}(\theta)$ will be small. Using a very large training set with these algorithms means we will be unlikely to overfit, and hence exhibit low variance. Consequently, $J_{train}(\theta) \approx J_{test}(\theta)$ and hence $J_{test}(\theta)$ will be small. Therefore we will have a low bias and low variance algorithm.\\
 More data will not help when the features $x$ do not contain enough information to predict $y$ accurately, regardless of if we have a large number of hidden units or have simple algorithm. A useful test is: given the input $x$, can a human expert confidently predict $y$ based solely on the features $x$?
 
+\section{Week 7}
+\subsection{Large Margin Classification - Support Vector Machines}
+\subsubsection{Optimization Objective}
+SVMs are an alternative view of logistic regression. Examining the cost terms when $y=0$ (when $\theta^Tx >> 0$) and $y=1$ (when $\theta^Tx << 0$), we get $z = -log \frac{1}{1+e^{-z}}$ and $z = -log \frac{1}{1+e^{-z}}$, $z = -log (1-\frac{1}{1+e^{-z}})$, respectively. Define $cost_1(z)$ and $cost_0(z)$ as the cost functions when $y=1$ and $y=0$ respectively for an SVM, which are the asymptotic versions of the aforementioned cost components for logistic regression. $cost_1(z) = 1$ for $z > 1$.  $cost_0(z) = 1$ for $z < -1$.\\
+Logistic regression had the form $A + \lambda B$; SVMs have the form $CA + B$ where if $C = \lambda^{-1}$, then the two optimization objectives should give you the same values for $\theta$. In other words, the equations aren't identical, but yield the same result in minimization.
+
+$$ \textrm{minimize } \theta \textrm{ in } C \sum_{i=1}^{m}[y^{(i)}\textrm{cost}_1(\theta^Tx^{(i)}) + (1-y^{(i)})\textrm{cost}_0(\theta^Tx^{(i)})] + \frac{1}{2}\sum_{i=1}^{n}\theta_j^2$$
+
+SVM hypothesis does not output probabilities like in logistic regression.
+\( h_\theta(x) = 
+\begin{cases}
+      1 & \textrm{if } \theta^Tx \geq 0 \\
+      0 & \textrm{otherwise}
+\end{cases} \\
+\)
+
+\subsubsection{Large Margin Intuition}
+If $y = 1$, we want $\theta^Tx \geq 1$ (not just $\geq 0$ like in logistic regression).
+If $y = 0$, we want $\theta^Tx \leq -1$ (not just $\le 0$ like in logistic regression).
+SVM doesn't just want to "barely get the example right." Adds a safety margin into SVM.
+
+SVMs try to separate the data (ie. draw a decision boundary) with as large a margin from the training examples as possible when C is very large. If C is very large, then the SVM will not reject outliers. If C is not too large, it will have reasonable outlier rejection.
+
+Math behind SVMs as a large margin classifier: https://www.coursera.org/learn/machine-learning/lecture/3eNnh/mathematics-behind-large-margin-classification
+
+\subsection{Kernels}
+\subsubsection{Motivation}
+We want to fit non-linear decision boundaries, but it's not evident that introducing polynomial terms it the best choice as previously used.
+\subsubsection{Landmarks}
+Given $x$, compute new features depending on the proximity to 'landmarks' $l^{(1)},...,l^{(m)}$.
+\subsubsection{Kernel Function}
+Our features are now defined by $f_i$ (formerly by $x_i$). 
+$$f_1 = similarity(x, l^{(1)}) = exp(-\frac{||x-l^{(1)}||^2}{2\sigma^2}) = exp(-\frac{\sum_{j=1}^{n}(x_j-l_j^{(1)})^2}{2\sigma^2})$$
+The similarity function is known as a Gaussian Kernel. There are other Kernel functions. Also expressed as $k(x, l^{(1)})$. When $x \approx l^{(1)}$, then $f_1 \approx 1$ If $x$ is far from $l^{(1)}$ then $f_1 \approx 0$.
+\subsubsection{How to Choose Landmarks}
+Choose landmarks as exactly the same location as training examples. So $l^{(m)} = x^{(m)}$. We generate a feature vector $ f = [f_0, f_1, ..., f_m]$ where $f_0 = 1$. Given a training example, we can compute the vector $f$ - one of the terms must be equal to 1 as there will be a landmark equivalent to that training example. Therefore, each training example can be represented as a feature vector.
+
+\subsubsection{SVM with Kernels}
+SVMs and Kernels go well together due to advanced computational optimization techniques - kernels tend to not be computationally efficient for other things like logistic regression. \\
+Hypothesis: Given $x$, compute features $f \epsilon R^{m+1}$. Predict $y = 1$ if $\theta^Tf \geq 0$. Note that $\theta \epsilon R^{m+1}$.\\
+Training:  $$ (\textrm{minimize w.r.t } \theta) C \sum_{i=1}^m y^{(i)}cost_1(\theta^Tf^{(i)}) + (1-y^{(i)})cost_0(\theta^Tf^{(i)}) + \frac{1}{2}\sum_{j=1}^{n}\theta_j^2$$
+Since $ n = m $ since we have as many features (due to selection of landmarks) as we have training examples, the second summation can be rewritten. Also we continue to omit $\theta_0$ in regularization hence why we start from $j=1$.
+
+\subsubsection{SVM Parameters}
+$C$ plays a role similar to $\lambda^{-1}$. Large $C$ causes lower bias, higher variance. Smaller $C$ causes higher bias, lower variance.\\
+Large $\sigma^2$ means features $f_i$ vary more smoothly (not as sharp of a peak, but still the same peak value of 1). This means there is higher bias and lower variance. Small $\sigma^2$ means features less smoothly, meaning similarity function moves more abruptly. Higher bias, lower variance.
+
+\subsection{Using an SVM}
+Use an SVM software package like liblinear or libsvm to solve for $\theta$. We need to specify: C and kernel (similarity function).
+
+Choices:
+\begin{enumerate}
+	\item No kernel (linear kernel). Predict $y = 1$ when $\theta^Tx \geq 0$. Use when $n$ is large (lots of features) and $m$ is small, using linear decision boundary to avoid overfitting. Very similar to logistic regression.
+	\item Gaussian kernel. We need to choose a $\sigma^2$ which varies bias/variance. Use when $n$ is small (like 2D training set) and/or $m$ is large (lots of training examples).
+\end{enumerate}
+Do perform feature scaling before using the Gaussian Kernel. This is important because we are taking squares and the distance between an input $x$ and the landmark $l$ can start to become dominated by the distance between just one of the features.
+
+\subsubsection{Other Kernels}
+Polynomial kernel: $(x^Tl + \textrm{constant})^{\textrm{degree}}$. Tends to be not that great, used more when $x$ and $l$ are always non-negative.\\
+Others: String kernel (for input that's string-based), chi-square kernel, histogram intersection kernel. Not all similarity functions make valid kernels - we must satisfy Mercer's Theorem to make sure the SVMs packages' optimizations run correctly and do not diverge.\\
+Choose parameters and kernel type based on whatever performs best on the cross-validation data.
+\subsubsection{Multi-class Classification}
+Many SVM packages already have built-in multi-class classification functionality. Otherwise, use one-vs.-all method (Train K SVMs, one to distinguish $y=i$ from the rest, for $i = 1,2,..,K)$, get $\theta^{(1)},...,\theta^{(K)}$. Pick class $i$ with largest $(\theta^{(i)})^Tx$.
+\subsubsection{Logistic Regression vs SVM}
+When $n$ = number of features ($x \epsilon R^{n+1}$), $m$ = number of training examples. If $n \geq m$ use logistic regression, or SVM with "linear kernel". This is because if you have a lot of features with a smaller training set, a linear function will probably do fine, and you don't have much data to fit a nonlinear function.\\
+When $n$ is small and $m$ is intermediate ($n=1-1000, m=10-10000$), use SVM with Gaussian Kernel. \\
+If $n$ is small and $m$ is large ($n=1-1000, m=50000+$), create/add more features, then use logistic regression or SVM without a Kernel. Having a massive training set size causes Gaussian Kernel use to be slow.
+\subsubsection{Neural Network vs SVM}
+Neural network likely to work well for all the above settings, but may be slower to train. SVM optimizations are convex problems, so you'll always get global optimum. Neural networks can give local optima.
 \end{document}
