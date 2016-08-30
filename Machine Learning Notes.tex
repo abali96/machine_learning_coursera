@@ -463,7 +463,7 @@ Training:  $$ (\textrm{minimize w.r.t } \theta) C \sum_{i=1}^m y^{(i)}cost_1(\th
 Since $ n = m $ since we have as many features (due to selection of landmarks) as we have training examples, the second summation can be rewritten. Also we continue to omit $\theta_0$ in regularization hence why we start from $j=1$.
 
 \subsubsection{SVM Parameters}
-$C$ plays a role similar to $\lambda^{-1}$. Large $C$ causes lower bias, higher variance. Smaller $C$ causes higher bias, lower variance.\\
+$C$ plays a role similar to $\lambda^{-1}$. Large $C$ causes lower bias, higher variance (tells SVM to classify all examples correctly). Smaller $C$ causes higher bias, lower variance.\\ $C$ is a positive value that controls the penalty for misclassified training examples.
 Large $\sigma^2$ means features $f_i$ vary more smoothly (not as sharp of a peak, but still the same peak value of 1). This means there is higher bias and lower variance. Small $\sigma^2$ means features less smoothly, meaning similarity function moves more abruptly. Higher bias, lower variance.
 
 \subsection{Using an SVM}
@@ -488,4 +488,134 @@ When $n$ is small and $m$ is intermediate ($n=1-1000, m=10-10000$), use SVM with
 If $n$ is small and $m$ is large ($n=1-1000, m=50000+$), create/add more features, then use logistic regression or SVM without a Kernel. Having a massive training set size causes Gaussian Kernel use to be slow.
 \subsubsection{Neural Network vs SVM}
 Neural network likely to work well for all the above settings, but may be slower to train. SVM optimizations are convex problems, so you'll always get global optimum. Neural networks can give local optima.
+
+\section{Week 8}
+\subsection{Clustering - K-means Algorithm}
+Most popular, most widely used. Inputs: K (number of clusters), training set $\{x^{(1)},...,x^{(m)}\}$. Use convention that training examples are n-dimensional vector, $x^{(i)} \epsilon R^n$ (drop $x_0 = 1$ convention). Algorithm: randomly initialize $K$ cluster centroids $\mu_1,..,\mu_k \epsilon R^m$. Repeat:
+\begin{lstlisting}
+	for i = 1 to m
+		# cluster assignment step
+		c^(i) := an index (from 1 to K) corresponding to cluster
+		 centroid closest to x^(i). Take each example and find the
+		 closest cluster centroid. Find index k that minimizes 
+		 ||x^{(i)} - Mu_k||^2.
+	for k = 1 to K
+		# move position of centroid
+		Mu_k = average (mean) of points assigned to cluster k
+		# this means Mu an n-dimensional vector 
+\end{lstlisting}
+If there is a cluster centroid with 0 points assigned to it, eliminate the cluster centroid, or randomly re-initialize it.
+\subsubsection{K-means for non-separated clusters}
+Works on non-separated clusters - market segmentation might be an example.
+
+\subsubsection{Optimization Objective}
+Terminology/variables
+\begin{enumerate}
+	\item $c^{(i)}$ index of cluster {1,2,...,K} to which example $x^{(i)}$ is currently assigned
+	\item $\mu_k$ = cluster centroid $k$ ($\mu_k \epsilon R^n$)	
+	\item $\mu_{c^{(i)}}$ = cluster centroid of cluster to which example $x^{(i)}$ has been assigned
+\end{enumerate}
+$$J(c^{(1)},...,c^{(m)}, \mu_1,...,\mu_K) = \frac{1}{m}\sum_{i=1}^{m}||x^{(i)} - \mu_{c^{(i)}}||^2$$ The summation is for the distance between the example $x^{(i)}$ and the location of the cluster centroid to which that example has been assigned. The objective is to minimize $J$ with respect to parameters $c, \mu$. Also called the 'distortion' function. The 'cluster assignment' step minimizes $J$ with respect to $c$. The 'move centroid' step minimizes $J$ with respect to $\mu$.
+
+\subsubsection{Random Initialization}
+Should have $K < m$, intuitively. Randomly pick $K$ training examples. Set $\mu_1,...,\mu_K$ equal to these $K$ examples.\\
+K=means can end up at local optima depending on the initialization. Normally run K-means 50-1000 times. Algorithm (for i = 1 to 100):
+\begin{enumerate}
+	\item Randomly initialize K-means
+	\item Run K-means. Get $c, \mu$.
+	\item Compute cost function (distortion) $J$
+\end{enumerate}
+Pick clustering that gave lowest cost $J(c^{(i)},...,c^{(m)}, \mu_1,...,\mu_K)$. If $K = 2 \textrm{to} 10$ you're likely go see benefits from this method. But if $K$ is in the hundreds, it's more likely that the first solution will give you a pretty decent optimum. Doing more random initializations may help a bit, but probably not huge.
+\subsubsection{Choosing Number of Clusters}
+No good automatic solution - look at visualizations/output of clustering algorithm.\\
+Elbow method: Plot $J$ against $K$ (number of clusters). Cost will decrease rapidly, and then suddenly start decreasing less rapidly (forming an elbow). But location of 'elbow' isn't always clear.\\
+Alternatively, evaluate K-means based on a metric for how well it performs for your later down-stream purpose.
+\subsection{Dimensionality Reduction}
+If you have highly correlated features (ie. measurement in centimetres and measurement in inches), you may want to reduce the dimension from 2D to 1D. Fit a line through the data with respect to the two features - project the examples onto the line. Now you only need 1 number to specify the position of the point on the line. This is an approximation of the training set. Allows learning algorithms to run more quickly and reduces memory requirement.\\
+You can also reduce 3D to 2D by projecting the data onto a plane. Each example can now be represented using 2 real numbers (or a 2-dimensional vector $z$).\\
+Dimensionality reduction also allows us to visualize data more easily. Given $n$ features find some way to determine two features that summarize the data then plot in 2D.
+\subsubsection{Principal Component Analysis (PCA)}
+Tries to find a lower-dimensional surface on which to project data such that average squared projection error is a minimum. First perform mean normalization and feature scaling. (For 2D to 1D, find a vector). Formally, to reduce from n-dimension to k-dimension: find $k$ vectors $u^{(1)}, u^{(2)}, ..., u^{(k)}$ onto which to project the data, so as to minimize the projection error. Project data onto the linear subspace spanned by the set of $k$ vectors.\\
+PCA is not linear regression - PCA tries to minimize the orthogonal distance to the lower-dimensional surface, whereas linear regression tries to minimize the 'vertical' direction (the $y$ direction) error. In PCA, all features are treated symmetrically (there is no $y$ to prefer).
+\subsubsection{PCA Algorithm}
+Data preprocessing: mean normalization (compute the mean of each feature, replace each $x_j^{(i)}$ with $x_j - \mu_j$ to get 0 mean). If different features are on different scales, scale features to have comparable range of values. 
+Algorithm:
+\begin{enumerate}
+	\item Compute covariance matrix $\sum = \frac{1}{m} \sum_{i=1}^{m} (x^{(i)})(x^{(i)})^T $. Vectorized: Sigma = 1/m * X' * X
+	\item Compute the eigenvectors of matrix $\sum$ with [U,S,V] = svd(Sigma) in MATLAB. Note that 'svd' is singular value decomposition. $x^{(i)}$ is an $n \times 1$ vector, making $(x^{(i)})(x^{(i)})^T$ $n \times n$.
+	\item $U$ is $n \times n$. The first $k$ columns of the U matrix are the vectors you want. This is a $n \times k$ matrix, which we call $U_{reduce}$. Ureduce = U(:, 1:k).
+	\item Let $z = U_{reduce} \times x$, which is a k-dimensional vector. ($z^{(i)} = U_{reduce} \times x^{(i)})$ or z = Ureduce' * x. Similar to k-means, apply to vectors $x \epsilon R^n$ - not done with $x_0 =1$ convention. 
+\end{enumerate}
+We can often reduce 5-10x without losing much variance in the data.
+
+\subsubsection{Reconstruction from Compressed Representation}
+Since $z = U_{reduce}^Tx$, then $X_{approx} = U_{reduce} z$ where $X_{approx}$ is $n \times 1$. 
+
+\subsubsection{Choosing Number of Principal Components $k$}
+Compactly, $svd$ returns an $S$ matrix, which is diagonal. Pick the smallest value of $k$ such that $$\frac{\sum_{i=1}^{k}S_{ii}}{\sum_{i=1}^mS_{ii}}\geq 0.99$$. This quantity is more explicitly equivalent to the average squared projection error $\frac{1}{m} \sum_{i=1}^{m} ||x^{(i)} - x_{approx}^{(i)}||^2$ divided by the total variation in the data $\frac{1}{m} \sum_{i=1}^{m} ||x^{(i)}||^2$ being less than 0.01. This means we have 99\% of variance retained. We usually want between 95 and 99\% variance retained. A crude algorithm would be to increase $k$ iteratively, compute $U_{reduce}$, $z$, and $x$, and keep going until the aforementioned long-form division is less than or equal to 0.01, but this is very slow.\\
+
+
+\subsubsection{Advice for Applying PCA}
+Supervised learning speedup: given $(x^{(1)},y^{(1)}),...,(x^{(m)},y^{(m)})$, extract the inputs into an unlabeled dataset $x^{(1)},...,x^{(m)}$ which is of a high order. Run PCA on the unlabelled data set to make it a lower order input $z^{(1)},...,z^{(m)}$. The new training set is now $(z^{(1)},y^{(1)}),...,(z^{(m)},y^{(m)})$. Any new examples coming in must first be mapped to $z$ and then passed into the hypothesis. Note: mapping $x^{(i)}$ to $z^{(i)}$ should be defined by running PCA only on the training set. This mapping can be applied to the examples $x_{cv}^{(i)}$ and $x_{test}^{(i)}$ in the cross-validation and test sets.\\
+Bad use of PCA: to prevent overfitting as a result of a smaller number of features. This might okay, but you should use regularization instead. PCA doesn't consider the $y$ values when it throws some info away.\\
+Before implementing PCA, first try running whatever you want to do with the original/raw data $x^{(i)}$. Only if that doesn't do what you want (slow, too much memory), then implement PCA and consider using compressed representation $z^{(i)}$.
+
+\subsection{Anomaly Detection}
+Given dataset that is assumed to be non-anomalous: $\{ x^{(1)}, x^{(2)}, ..., x^{(m)} \}$. Is $x_{test}$ anomalous? Build probabalistic model $p(x)$ using data set and use some $\epsilon$ threshold. \\ 
+Applications: fraud detection (could be supervised learning if you have a lot of examples of kinds of fraud), manufacturing QA, monitoring computers in a data center
+
+\subsubsection{Gaussian Distribution}
+Area under the curve is constant. Smaller $\sigma$ means taller curve. We say: 
+$ x \tilde{} N(\mu, \sigma^2) $. Tilde means 'distributed as'. 
+
+\subsubsection{Density Estimation}
+Given training set $x^{(1)},...,x^{(m)}$ where each example $x \epsilon R^n$. Algorithm:
+\begin{enumerate}
+	\item Choose features $x_i$ that you think might be indicative of anomalous examples.
+	\item Fit parameters $\mu_1,...\mu_n, \sigma^2_1,...,\sigma^2_n$
+	\item $\mu_j = \frac{1}{m}\sum_{i=1}^{m}x_j^{(i)}$, $\sigma^2_j = \frac{1}{m}\sum_{i=1}^{m}(x_j^{(i)} - \mu_j)^2$. Mu is a vector of size n.
+	\item Given a new example $x$, compute $p(x) = \prod_{j=1}^np(x_j;\mu_j,\sigma^2_j) = \prod_{j=1}^n \frac{1}{\sqrt{2\pi}\sigma_j}exp(\frac{-(x_j-\mu_j)^2 } {2 \sigma_j^2 })$
+	\item 
+	\item Anomaly if $p(x) < \epsilon$
+\end{enumerate}
+
+\subsubsection{Developing and Evaluating an Anomaly Detection System}
+Assume we have some labeled data of anomalous and non-anomalous examples ($y = 0$ if normal, $y=1$ if anomalous). Assume that the training set $x^{(1)},...,x^{(m)}$ contains normal examples (non-anomalous) but it's okay if a few anomalies slip into the training set. Cross-validation set: $(x_{cv}^{(1)},y_{cv}^{(1)}),...,(x_{cv}^{(m_{cv})},y_{cv}^{(m_{cv})})$. Test set: $(x_{test}^{(1)},y_{test}^{(1)}),...,(x_{test}^{(m_{test})},y_{test}^{(m_{test})})$. Include 50\% of your anomalous examples in the cross-validation set and 50\% of your anomalous examples in the test set. Use the old 60-20-20 breakup for the non-anomalous examples between the sets. We usually have 2-50 anomalous examples for thousands of normal examples.
+
+Fit model $p(x)$ on training set. On a cross-validation/test example, $x$, predict $y = 1$ if $p(x) < \epsilon \textrm( anomaly )$ and predict $y = 0$ otherwise (normal). We have a skewed data set inherently (we're dealing with anomalies), so some evaluation metrics should include precision/recall, F1 score, true/false positives/negatives. You can also use the cross-validation set to choose the parameter $\epsilon$ that maximizes F1 score. Continue to evaluate algorithm in terms of $\epsilon$, which features to include, etc. based on cross-validation set. Then take final model and evaluate it on the test set.
+
+\subsubsection{Anomaly Detection vs Supervised Learning}
+Since we're labelling our data as anomalous and normal, why not use supervised learning (logistic regression, neural network)?
+Use anomaly detection if: we have a very small number of positive examples (y=1) in the range of 0-20 and a large number of negative (y=0) examples (used to fit p(x). Usually you have such a small set of these, that you save them for the cross-validation set and the test set. Supervised learning is normally used when you have a large number of positive and negative examples.\\
+Anomaly detection algorithms are used for many "types" of anomalies - future anomalies may look nothing like any of the anomalous examples we've seen so far. That's why we model based on the negative examples.  Supervised learning is used when you have enough positive examples for the algorithm to get a sense of what positive examples are like - future positive examples are likely to be similar to ones in the training set.\\
+For the spam email problem, although there are a lot of types of spam, we normally treat it as a supervised learning because we have enough data on all those 'anomalies'. 
+
+\subsubsection{Choosing what Features to Use for Anomaly Detection}
+Non-gaussian features: Plot the data with histogram - even if data is non-gaussian with respect to a feature, the algorithm can work okay. You can apply various transformations (like $log(x + c), x^c$) to the data to get it to look gaussian.\\
+Error analysis: The most common problem is that p(x) is comparable for both normal and anomalous examples, where in reality it should be large for normal examples and small for anomalous examples. Look at the anomalies that algorithm is failing to detect, and find unusual property of anomaly to find features that may indicate the anomaly. Choose features that might take on unusually large or small value sin the event of an anomaly (use things like ratios of existing features if that makes sense, ex. (CPU load)/(network traffic) as opposed to just looking at those features independently. 
+
+\subsubsection{Multivariate Gaussian Distribution}
+Motivation: Allows you to capture when you expect two different features to be positively/negatively correlated. Given 2 features, the way we were doing things before almost assumes that we have 'circles' of probability. But what if probabilities should radiate outward like an ellipse? \\
+$x \epsilon R^n$. We model $p(x)$ all in one shot as opposed to modelling $p(x_1), p(x_2),...$ separately.
+$$p(x;\mu, \sum) = \frac{1}{(2\pi)^{n/2}|\sum|^{1/2}} exp(-\frac{1}{2}(x-\mu)^Tinv(\sum)(x-\mu)) $$, where $\sum$ is the $n \times n$ covariance matrix and $\mu \epsilon R^n $. Varying diagonal elements: larger values mean wider, shorter bell in the given axis. Varying off diagonal elements: changes correlation (note it can be positive or negative).
+ \subsubsection{Fitting Parameters $\mu$ and $\sum$}
+ Parameter fitting: given training set $x^{(1)},...,x^{(m)}$, where $x \epsilon R^n$ $$\mu = \frac{1}{m	}\sum_{i=1}^{m}x^{(i)}$$ and $$\sum = \frac{1}{m}\sum_{i=1}^{m}(x^{(i)} - \mu)(x^{(i)} - \mu)^T $$\\
+\subsubsection{Relationship to Original Model}
+Original model (which is multiplication of $p(x, \mu, \sigma^2)$) is a special case of multivariate where the distribution contours are somethig a line?
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 \end{document}
