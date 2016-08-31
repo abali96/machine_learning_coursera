@@ -561,7 +561,7 @@ Bad use of PCA: to prevent overfitting as a result of a smaller number of featur
 Before implementing PCA, first try running whatever you want to do with the original/raw data $x^{(i)}$. Only if that doesn't do what you want (slow, too much memory), then implement PCA and consider using compressed representation $z^{(i)}$.
 
 \subsection{Anomaly Detection}
-Given dataset that is assumed to be non-anomalous: $\{ x^{(1)}, x^{(2)}, ..., x^{(m)} \}$. Is $x_{test}$ anomalous? Build probabalistic model $p(x)$ using data set and use some $\epsilon$ threshold. \\ 
+Given dataset that is assumed to be non-anomalous: $\{ x^{(1)}, x^{(2)}, ..., x^{(m)} \}$. Is $x_{test}$ anomalous? Build probabalistic model $p(x)$ using data set and use some $\varepsilon$ threshold. \\ 
 Applications: fraud detection (could be supervised learning if you have a lot of examples of kinds of fraud), manufacturing QA, monitoring computers in a data center
 
 \subsubsection{Gaussian Distribution}
@@ -573,20 +573,19 @@ Given training set $x^{(1)},...,x^{(m)}$ where each example $x \epsilon R^n$. Al
 \begin{enumerate}
 	\item Choose features $x_i$ that you think might be indicative of anomalous examples.
 	\item Fit parameters $\mu_1,...\mu_n, \sigma^2_1,...,\sigma^2_n$
-	\item $\mu_j = \frac{1}{m}\sum_{i=1}^{m}x_j^{(i)}$, $\sigma^2_j = \frac{1}{m}\sum_{i=1}^{m}(x_j^{(i)} - \mu_j)^2$. Mu is a vector of size n.
+	\item $\mu_j = \frac{1}{m}\sum_{i=1}^{m}x_j^{(i)}$, $\sigma^2_j = \frac{1}{m}\sum_{i=1}^{m}(x_j^{(i)} - \mu_j)^2$. $\mu$ is a vector of size $n$.
 	\item Given a new example $x$, compute $p(x) = \prod_{j=1}^np(x_j;\mu_j,\sigma^2_j) = \prod_{j=1}^n \frac{1}{\sqrt{2\pi}\sigma_j}exp(\frac{-(x_j-\mu_j)^2 } {2 \sigma_j^2 })$
-	\item 
-	\item Anomaly if $p(x) < \epsilon$
+	\item Anomaly if $p(x) < \varepsilon$
 \end{enumerate}
 
 \subsubsection{Developing and Evaluating an Anomaly Detection System}
 Assume we have some labeled data of anomalous and non-anomalous examples ($y = 0$ if normal, $y=1$ if anomalous). Assume that the training set $x^{(1)},...,x^{(m)}$ contains normal examples (non-anomalous) but it's okay if a few anomalies slip into the training set. Cross-validation set: $(x_{cv}^{(1)},y_{cv}^{(1)}),...,(x_{cv}^{(m_{cv})},y_{cv}^{(m_{cv})})$. Test set: $(x_{test}^{(1)},y_{test}^{(1)}),...,(x_{test}^{(m_{test})},y_{test}^{(m_{test})})$. Include 50\% of your anomalous examples in the cross-validation set and 50\% of your anomalous examples in the test set. Use the old 60-20-20 breakup for the non-anomalous examples between the sets. We usually have 2-50 anomalous examples for thousands of normal examples.
 
-Fit model $p(x)$ on training set. On a cross-validation/test example, $x$, predict $y = 1$ if $p(x) < \epsilon \textrm( anomaly )$ and predict $y = 0$ otherwise (normal). We have a skewed data set inherently (we're dealing with anomalies), so some evaluation metrics should include precision/recall, F1 score, true/false positives/negatives. You can also use the cross-validation set to choose the parameter $\epsilon$ that maximizes F1 score. Continue to evaluate algorithm in terms of $\epsilon$, which features to include, etc. based on cross-validation set. Then take final model and evaluate it on the test set.
+Fit model $p(x)$ on training set. On a cross-validation/test example, $x$, predict $y = 1$ if $p(x) < \varepsilon $ (anomaly) and predict $y = 0$ otherwise (normal). We have a skewed data set inherently (we're dealing with anomalies), so some evaluation metrics should include precision/recall, F1 score, true/false positives/negatives. You can also use the cross-validation set to choose the parameter $\varepsilon$ that maximizes F1 score. Continue to evaluate algorithm in terms of $\varepsilon$, which features to include, etc. based on cross-validation set. Then take final model and evaluate it on the test set.
 
 \subsubsection{Anomaly Detection vs Supervised Learning}
 Since we're labelling our data as anomalous and normal, why not use supervised learning (logistic regression, neural network)?
-Use anomaly detection if: we have a very small number of positive examples (y=1) in the range of 0-20 and a large number of negative (y=0) examples (used to fit p(x). Usually you have such a small set of these, that you save them for the cross-validation set and the test set. Supervised learning is normally used when you have a large number of positive and negative examples.\\
+Use anomaly detection if: we have a very small number of positive examples (y=1) in the range of 0-20 and a large number of negative (y=0) examples (used to fit $p(x)$). Usually you have such a small set of these, that you save them for the cross-validation set and the test set. Supervised learning is normally used when you have a large number of positive and negative examples.\\
 Anomaly detection algorithms are used for many "types" of anomalies - future anomalies may look nothing like any of the anomalous examples we've seen so far. That's why we model based on the negative examples.  Supervised learning is used when you have enough positive examples for the algorithm to get a sense of what positive examples are like - future positive examples are likely to be similar to ones in the training set.\\
 For the spam email problem, although there are a lot of types of spam, we normally treat it as a supervised learning because we have enough data on all those 'anomalies'. 
 
@@ -595,19 +594,149 @@ Non-gaussian features: Plot the data with histogram - even if data is non-gaussi
 Error analysis: The most common problem is that p(x) is comparable for both normal and anomalous examples, where in reality it should be large for normal examples and small for anomalous examples. Look at the anomalies that algorithm is failing to detect, and find unusual property of anomaly to find features that may indicate the anomaly. Choose features that might take on unusually large or small value sin the event of an anomaly (use things like ratios of existing features if that makes sense, ex. (CPU load)/(network traffic) as opposed to just looking at those features independently. 
 
 \subsubsection{Multivariate Gaussian Distribution}
-Motivation: Allows you to capture when you expect two different features to be positively/negatively correlated. Given 2 features, the way we were doing things before almost assumes that we have 'circles' of probability. But what if probabilities should radiate outward like an ellipse? \\
+Motivation: Allows you to capture when you expect two different features to be positively/negatively correlated (contours not necessarily axis-aligned)
 $x \epsilon R^n$. We model $p(x)$ all in one shot as opposed to modelling $p(x_1), p(x_2),...$ separately.
 $$p(x;\mu, \sum) = \frac{1}{(2\pi)^{n/2}|\sum|^{1/2}} exp(-\frac{1}{2}(x-\mu)^Tinv(\sum)(x-\mu)) $$, where $\sum$ is the $n \times n$ covariance matrix and $\mu \epsilon R^n $. Varying diagonal elements: larger values mean wider, shorter bell in the given axis. Varying off diagonal elements: changes correlation (note it can be positive or negative).
  \subsubsection{Fitting Parameters $\mu$ and $\sum$}
  Parameter fitting: given training set $x^{(1)},...,x^{(m)}$, where $x \epsilon R^n$ $$\mu = \frac{1}{m	}\sum_{i=1}^{m}x^{(i)}$$ and $$\sum = \frac{1}{m}\sum_{i=1}^{m}(x^{(i)} - \mu)(x^{(i)} - \mu)^T $$\\
 \subsubsection{Relationship to Original Model}
-Original model (which is multiplication of $p(x, \mu, \sigma^2)$) is a special case of multivariate where the distribution contours are somethig a line?
+Original model (which is multiplication of $p(x, \mu, \sigma^2)$) is a special case of multivariate where there are zeros on the non-diagonal elements.  (Note: diagonals are the $\sigma^2$ values). The original model has the contours always axis-aligned.
+\subsubsection{Anomaly Detection Algorithm with Multivariate Gaussian}
+\begin{enumerate}
+	\item Fit model $p(x)$ by setting $\mu = \frac{1}{m} \sum_{i=1}^{m}x^{(i)}$ and $\sum = \frac{1}{m}\sum_{i=1}^{m}(x^{(i)} - \mu)(x^{(i)}	 - \mu)^{T}$.
+	\item Given a new example $x$, compute: $p(x) = \frac{1}{(2\pi)^{n/2}|\sum|^{1/2}} exp(-\frac{1}{2}(x-\mu)^Tinv(\sum)(x-\mu)) $
+	\item Flag anomaly if $p(x) < \varepsilon$
+\end{enumerate}
+\subsubsection{When to use Multivariate vs Original Model}
+Original model: used more often, but requires that you manually create features to capture anomalies where $x_1, x_2$ take unusual combinations of values  (ie. they're correlated via some non-linear combination). Computationally cheaper. Scales better to large number of features, $n$. \\
+Multivariate Gaussian: Automatically captures correlations between features. Computationally more expensive as $\sum \epsilon R^{n \times n}$ and we're taking its inverse. We must also have $ m > n $ or else $\sum$ is non-invertible. In reality, you should have $m$ like 10x bigger than $n$. $\sum$ may also be non-invertible if you have redundant features or features that are linearly dependent. 
+
+\subsection{Recommendation Systems}
+\subsubsection{Problem formulation}
+Ex. predicting movie ratings - users rates movies using zero to five stars. Predict what they would have rated movies they haven't rated (ie. watched) in order to build a recommender system.
+
+Terminology:
+\begin{enumerate}
+	\item $n_u$ = number of users
+	\item $n_m$ = number of movies
+	\item $r(i, j) = 1$ if a user $j$ has rated movie $i$ (0 otherwise)
+	\item $y^{i,j}$ = rating by user $j$ on movie $i$ (if defined)
+	\item $\theta^{(j)}$ = parameter vector for user $j$
+	\item $x^{(i)}$ = feature vector for movie $i$
+	\item $m^{(j)}$ = number of movies rated by user $j$
+\end{enumerate}
+
+\subsubsection{Content-based Recommendations}
+Create a feature vector, $x$, for each movie (remember to include the $x_0 = 1$). For each user $j$, learn a parameter $\theta^{(j)} \epsilon R^3$. Predict user $j$ as rating movie $i$ with $(\theta^{(j)})^Tx^{(i)}$ stars.
+
+To learn $\theta^{(j})$: minimize with respect to $\theta^{(j)}$ the 
+$$ \frac{1}{2} \sum_{i:r(i,j)=1}((\theta^{(j)})^T(x^{(i)}) - y^{(i,j)})^2 + \frac{\lambda}{2}\sum_{k=1}^{n}(\theta_k^{(j)})^2$$
+$\theta^{(j)}$ is an $n + 1$ dimensional vector - don't regularize over $\theta_0$. 
+To learn $\theta^{(1)}, \theta^{(2)}, ..., \theta^{(n_u)}$ (for all users), minimize over $\theta^{(1)}, \theta^{(2)}, ..., \theta^{(n_u)}$:
+$$ J(\theta^{(i)},...,\theta^{(n_u)}) = \frac{1}{2} \sum_{j=1}^{n_u} \sum_{i:r(i,j)=1}((\theta^{(j)})^T(x^{(i)}) - y^{(i,j)})^2 + \frac{\lambda}{2}\sum_{j=1}^{n_u}\sum_{k=1}^{n}(\theta_k^{(j)})^2$$
+
+Gradient descent algorithm:
+$$\theta_k^{(j)} = \theta_k^{(j)} - \alpha \sum_{i:r(i,j)=1}((\theta^{(j)})^Tx^{(i)} - y^{(i,j)})x_k^{(i)} \textrm{ for k = 0}$$
+
+$$\theta_k^{(j)} = \theta_k^{(j)} - \alpha( \sum_{i:r(i,j)=1}((\theta^{(j)})^Tx^{(i)} - y^{(i,j)})x_k^{(i)}+ \lambda \theta_k^{(j)} ) \textrm{ for k $\neq$ 0}$$
+
+\subsection{Collaborative Learning}
+Algorithm learns what features to use by itself; every user collaborates to get better movie ratings for everyone. Let's say that the users told us their $\theta$ vector (their preference for movie genre). You can then try to find what the reasonable values for the features might be. We want to pick feature value such that the predicted value of how the user rates a movie is not far from the actual value in the squared error sense. 
+
+\subsubsection{Optimization algorithm}
+Given $\theta^{(1)}, ..., \theta^{(n_u)}$, to learn $x^{(i)}$ we must minimize with respect to $x^{(i)}$:
+$$ \frac{1}{2} \sum_{j:r(i,j)=1}((\theta^{(j)})^Tx^{(i)} - y^{(j,j)})^2 + \frac{\lambda}{2} \sum_{k=1}^n(x_k^{(i)})^2 $$
+
+Given $\theta^{(1)}, ..., \theta^{(n_u)}$, to learn $x^{(i)},...,x^{(n_m)}$ we must minimize with respect to $x^{(1)},...,x^{(n_m)}$:
+$$ \frac{1}{2} \sum_{i=1}^{n_m}\sum_{j:r(i,j)=1}((\theta^{(j)})^Tx^{(i)} - y^{(j,j)})^2 + \frac{\lambda}{2}\sum_{i=1}^{n_m} \sum_{k=1}^n(x_k^{(i)})^2 $$
+
+Basic collaborative filtering algorithm: given $x$ we can estimate $\theta$ and given $\theta$ we can estimate $x$. Start by guessing $\theta$ and find $x$ and then iterate to get a better guess of $\theta$, etc. 
+
+\subsubsection{Collaborative Filtering Algorithm}
+More efficient algorithm that doesn't alternative between $\theta$ and $x$ - can solve simultaneously. Notice that the first double summation in both the $\theta$ estimation and the $x$ estimation are basically doing the same summation just in different orders. We can combine the optimization objectives. In this case, we do away with $x_0$ and hence $\theta_0$ so both are vectors of size $n$, as opposed to formerly, $n + 1$. There is no need to hard code a feature equal to 1 because we're now learning all the features.
+$$ J(x^{(1)},...,x^{(n_m)}, \theta^{(1)},...,\theta^{(n_u)}) = \frac{1}{2} \sum_{i,j:r(i.j)=1} ((\theta^{(j)})^Tx^{(i)} - y^{(i,j)}) + \frac{\lambda}{2}\sum_{i=1}^{n_m}\sum_{k=1}^{n}(x_k^{(i)})^2 + \frac{\lambda}{2}\sum_{j=1}^{n_u}\sum_{k=1}^{n}(\theta_k^{(j)})^2$$
+Algorithm: 
+\begin{enumerate}
+	\item Initialize $x^{(1)},...,x^{(n_m)}, \theta^{(1)},...,\theta^{(n_u)}$ to small random values (to allow for symmetry breaking so that the features that are learned are different from each other)
+	\item Minimize $J(x^{(1)},...,x^{(n_m)},\theta^{(1)},...,\theta^{(n_u)})$ using gradient descent (or an advanced optimization algorithm). For every $j = 1,...,n_u, i=1,...,n_m$: $$x_k^{(i)} = x_k^{(i)} - \alpha (\sum_{j:r(i,j)=1}((\theta^{(j)})^Tx^{(i)} - y^{(i,j)})\theta_k^{(j)} + \lambda x_k^{(i)})$$
+		$$\theta_k^{(i)} = \theta_k^{(i)} - \alpha (\sum_{i:r(i,j)=1}((\theta^{(j)})^Tx^{(i)} - y	^{(i,j)})x_k^{(i)} + \lambda \theta_k^{(j)})$$
+	\item For a user with parameters $\theta$ and a movie with features $x$, predict a star rating of $\theta^Tx$.
+
+\end{enumerate}
+
+\subsection{Low Rank Matrix Factorization}
+\subsubsection{Vectorization: Low Rank Matrix Factorization}
+Low Rank Matrix Factorization is just another name for collaborative filtering. If we have matrix $X$ which has as its rows the transpose of $x^{(1)}$ all the way to $x^{(n_m)}$ and a matrix $\theta$ which has as its rows the transpose of $\theta^{(1)}$ to  $\theta^{(n_u)}$, then the predicted ratings are $X \theta^T$, which is a low rank matrix.
+
+\subsubsection{Finding Related Movies}
+After creating features, it's hard to have human-understandable form for them. To determine if movie $j$ is related to movie $i$, you need to find it where you have a small value of $||x^{(i)} - x^{(j)}||$ (they're similar).
+
+\subsubsection{Implementation Detail - Mean Normalization}
+Can make algorithm work a little better. Normalize each row of matrix that stores ratings for various movies by various users (users on y axis). Subtract the row's mean from each element in that row. Using this mean-normalized data, then learn $\theta^{(j)}, x^{(i)}$. For a user $j$ on a movie $i$, predict 
+$(\theta^{(j)})^T(x^{(i)}) + \mu_i$. This way, if a user has not rated anything, you'll have a non-zero $\theta$ vector for them which is now actually equivalent to just the average rating for that movie.	
+
+\section{Week 10}
+\subsection{Learning With Large Datasets}
+Before coding, do sanity check that a smaller data set would not suffice. Look for a high variance learning curve. 
+\subsection{Gradient Descent with Large Datasets}
+Gradient Descent (more specifically, the 'batch' version) becomes more computationally expensive when dealing with large datasets as we sum over $m$ examples. 
+\subsubsection{Stochastic Gradient Descent}
+For linear regression: $cost(\theta, (x^{(i)}, y^{(i)})) = \frac{1}{2}(h_\theta(x^{(i)}) - y^{(i)})^2.$
+$$ J_{train}(\theta) = \frac{1}{m}\sum_{i=1}^{m}cost(\theta, (x^{(i)}, y^{(i)}))$$
+Algorithm:
+\begin{enumerate}
+	\item Randomly shuffle dataset (speeds up convergence)
+	\item Repeat: for i = 1,..,m
+	\begin{enumerate}
+		\item $\theta_j = \theta_j - \alpha (h_\theta(x^{(i)}) - y^{(i)})  x_j^{(i)}$ (for j = 0,...,n)
+	\end{enumerate}
+\end{enumerate}
+The term multiplied by $\alpha$ is the partial derivative with respect to $\theta_j$ of the cost function in terms of $\theta$ and $(x^{(i)}, y^{(i)})$.
+In each step in the inner loop, do a little gradient descent step with respect to just the one training example to try to fit it better.
+Rather than passing through all training examples before modifying the parameters and making progress. In stochastic, you can just look at a single training example and start making progress already. Each iteration may generally move the parameters in the direction of the global minimum, but not always (takes a more stochastic path). Doesn't get to the global minimum - keeps wandering around it in a small region.\\
+You normally do the outer loop between 1 to 10 times.
+
+\subsubsection{Mini-Batch Gradient Descent}
+Can sometimes work faster than stochastic. Batch gradient descent used $m$ examples in each iteration. Stochastic gradient descent uses 1 example in each iteration. Mini-batch gradient descent uses $b$ examples in each iteration. \\
+Typically pick $b$ between 2 and 100.Say $b = 10, m = 1000$.
+\begin{enumerate}
+	\item Repeat:
+	\begin{enumerate}
+		\item for $i = 1, 11, ... 991 $
+		\begin{enumerate}
+			\item $\theta_j = \theta_j - \alpha \frac{1}{10}\sum_{k=i}^{i+9}(h_\theta(x^{(k)}) - y^{(k)})x^{(k)}_j$ (for every $j = 0,...,n$)
+		\end{enumerate}
+	\end{enumerate}
+\end{enumerate}
+Out-performs stochastic gradient descent if you have a good vectorized implementation. (You can partially parallelize the gradient computations). Disadvantage is that you have to select $b$.
+\subsubsection{Stochastic Gradient Descent Convergence}
+During learning, compute $cost(\theta, (x^{(i)}, y^{(i)}))$ before updating $\theta$ using $(x^{(i)}, y^{(i)})$. Every 1000 (arbitrary) iterations, plot 	$cost(\theta, (x^{(i)}, y^{(i)}))$ averaged over the last 1000 processed by the algorithm. Graph may be noisy. Averaging over more examples can make smoother curve to see overall trend better but feedback is less granular obviously.\\
+It is possible to get a better result with a smaller learning rate because the parameters oscillate in a smaller fashion around the global minimum. If  cost increases, use smaller value of $\alpha$. $\alpha$ is typically held constant, but you can slowly decrease it over time if you want $\theta$ to converge. $\alpha = \frac{const1}{iterationNumber1 + const2}$.
+\subsection{Online Learning}
+Don't use a fixed training set, just learn continuously from the web traffic you're getting then throw away that data point. 
+Example: dynamically adjusting price of product based on if a user happens to purchase the product. You can get the $(x,y)$ corresponding to the given user, use it to update $\theta$ using the gradient descent update rule (with no summation since we only have the one example), and then throw it out. This algorithm adapts to changes in user preferences. Learn $p(y=1|x;\theta)$, $\theta_j = \theta_j - \alpha(h_\theta(x) - y)x_j$ for (j = 0,...,n)\\
+Example: predicted click through rate (CTR) ie. if you have a search results page, you want to determine, based on the features of the search results, what the probability is that the user will click through and then learn which search results are best to display.\\
+Other examples: displaying special offers, customized selection of news articles, product recommendations.
+\subsection{Map Reduce and Data Parallelism}
+Many learning algorithms can be expressed as computing sums of functions over the training set. Split up chunks of the sums, send them to different computers/cores, then sum the results. For neural networks, use map-reduce method to compute forward propagation and backward propagation on 1/10 of the data to compute the derivative with respect to that 1/10 of the data. 
 
 
 
-
-
-
+\section{Week 11}
+\subsection{Photo OCR}
+Machine learning pipeline: system with many stages/components, several of which use machine learning.\\
+Photo OCR machine learning pipeline: Given image, 1. Text detection. 2. Character Segmentation. 3. Character classification.
+\subsection{Sliding Windows}
+Example: pedestrian detection supervised learning. Each pedestrian probably has a 'fixed' aspect ratio - about 82 by 36 pixels lets say. Train classifier with lots of positive and negative examples. Then given a picture, move our sliding window of that constant rectangle size by a step-size/stride and try to see if there is a pedestrian in that window. Then do the same thing with a larger image patch, but scale it down into the size recognized by the classifier.\\
+For text detection using sliding windows, train classifier with pictures of characters vs. pictures with no characters. You can then build a map of all the regions of probability where it thinks it found a character. Run an 'expansion' step on the high probability regions so that contiguous characters' regions now overlap into one big region.\\
+Then, we need a 1D sliding window for character segmentation (constant window size and only 1D sliding because we're only looking at a box that contains a line of text). We train a classifier with positive examples being images with a split down the middle of two characters and negative examples being full characters. We can then slide the window and find the locations where we should split the image up into characters.\\
+Lastly, we perform character classification.
+\subsection{Getting Lots of Data and Artificial Data}
+Most reliable way to get high performance learning system is to take low bias algorithm and train it on a massive data set. In the example of character recognition, you can download various fonts and paste them on random backgrounds and add some rotation and scaling to get lots of synthetic data. You can also synthesize data by introducing distortions in real data (like warping the characters). In the application of speech recognition, we could add various realistic background noise. Usually it does not help to add purely random/meaningless noise to the data.\\
+Make sure you have a low bias classifier before expending the effort (ie. plot the learning curves). Keep increasing the number of features/hidden units in neural network until you have a low bias classifier. \\
+Always ask: "how much work would it be to get 10x as much data as we currently have". The answer could be artificial data synthesis or to collect/label it yourself and you should mathematically determine how long it would take. Lastly, you could crowd source (get people to label) - Amazon Mechanical Turk. 
+\subsection{Ceiling Analysis: What Part of Pipeline to Work on Next}
+You try to determine the upside potential of improving a given component. Create a table with Component and Accuracy columns. Compute the accuracy of the overall system as is. Now, go component by component, and for each test set example, just provide the correct output (manually), thereby simulating what would happen if that component had 100\% accuracy. Compute the accuracy of the entire system. Keeping the 100\% accuracy on the previous component, now provide the correct output manually for the next component, and compute the accuracy of the overall system. Find the step transition that has the biggest delta in accuracy from one step to the next. The difference between the current system state accuracy and the accuracy where the first component has perfect output is the potential gain from improving that first component. The difference between the accuracy where the first component has perfect output and where the second component has perfect output gives the potential gain from improving the second component. 
 
 
 

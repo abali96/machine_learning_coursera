@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.16 (TeX Live 2015) (preloaded format=pdflatex 2015.10.11)  29 AUG 2016 22:58
+This is pdfTeX, Version 3.14159265-2.6-1.40.16 (TeX Live 2015) (preloaded format=pdflatex 2015.10.11)  31 AUG 2016 01:06
 entering extended mode
  restricted \write18 enabled.
  file:line:error style messages enabled.
@@ -332,29 +332,44 @@ Underfull \hbox (badness 10000) in paragraph at lines 555--556
  []
 
 [26]
-Overfull \hbox (82.24895pt too wide) in paragraph at lines 577--579
+Overfull \hbox (82.24895pt too wide) in paragraph at lines 577--578
 []\OT1/cmr/m/n/10.95 Given a new ex-am-ple $\OML/cmm/m/it/10.95 x$\OT1/cmr/m/n/10.95 , com-pute $\OML/cmm/m/it/10.95 p\OT1/cmr/m/n/10.95 (\OML/cmm/m/it/10.95 x\OT1/cmr/m/n/10.95 ) = [][] \OML/cmm/m/it/10.95 p\OT1/cmr/m/n/10.95 (\OML/cmm/m/it/10.95 x[]\OT1/cmr/m/n/10.95 ; \OML/cmm/m/it/10.95 ^^V[]; ^^[[]\OT1/cmr/m/n/10.95 ) = [][] []\OML/cmm/m/it/10.95 exp\OT1/cmr/m/n/10.95 ([])$ 
  []
 
 [27] [28]
-Underfull \hbox (badness 10000) in paragraph at lines 602--603
+Underfull \hbox (badness 10000) in paragraph at lines 601--602
 
  []
 
-[29] (/Users/abali/Drive/Code/ml_coursera/.texpadtmp/Machine Learning Notes.aux) ) 
+[29] [30] [31]
+Overfull \hbox (98.739pt too wide) detected at line 657
+\OML/cmm/m/it/10.95 J\OT1/cmr/m/n/10.95 (\OML/cmm/m/it/10.95 x[]; :::; x[]; ^^R[]; :::; ^^R[]\OT1/cmr/m/n/10.95 ) = [] []((\OML/cmm/m/it/10.95 ^^R[]\OT1/cmr/m/n/10.95 )[]\OML/cmm/m/it/10.95 x[] \OMS/cmsy/m/n/10.95 ^^@ \OML/cmm/m/it/10.95 y[]\OT1/cmr/m/n/10.95 ) + [] [] [](\OML/cmm/m/it/10.95 x[]\OT1/cmr/m/n/10.95 )[] + [] [] [](\OML/cmm/m/it/10.95 ^^R[]\OT1/cmr/m/n/10.95 )[]
+ []
+
+
+Overfull \hbox (2.00648pt too wide) in paragraph at lines 661--661
+\OT1/cmr/m/n/10.95 ad-vanced op-ti-miza-tion al-go-rithm). For ev-ery $\OML/cmm/m/it/10.95 j \OT1/cmr/m/n/10.95 = 1\OML/cmm/m/it/10.95 ; :::; n[]; i \OT1/cmr/m/n/10.95 = 1\OML/cmm/m/it/10.95 ; :::; n[]$\OT1/cmr/m/n/10.95 : 
+ []
+
+[32] [33]
+Overfull \hbox (9.59697pt too wide) in paragraph at lines 713--715
+\OT1/cmr/m/n/10.95 During learn-ing, com-pute $\OML/cmm/m/it/10.95 cost\OT1/cmr/m/n/10.95 (\OML/cmm/m/it/10.95 ^^R; \OT1/cmr/m/n/10.95 (\OML/cmm/m/it/10.95 x[]; y[]\OT1/cmr/m/n/10.95 ))$ be-fore up-dat-ing $\OML/cmm/m/it/10.95 ^^R$ \OT1/cmr/m/n/10.95 us-ing $(\OML/cmm/m/it/10.95 x[]; y[]\OT1/cmr/m/n/10.95 )$.
+ []
+
+[34] [35] [36] [37] (/Users/abali/Drive/Code/ml_coursera/.texpadtmp/Machine Learning Notes.aux) ) 
 Here is how much of TeX's memory you used:
- 3391 strings out of 494501
- 48520 string characters out of 6167029
+ 3396 strings out of 494501
+ 48566 string characters out of 6167029
  115891 words of memory out of 5000000
- 6632 multiletter control sequences out of 15000+600000
- 11352 words of font info for 43 fonts, out of 8000000 for 9000
+ 6635 multiletter control sequences out of 15000+600000
+ 11997 words of font info for 46 fonts, out of 8000000 for 9000
  319 hyphenation exceptions out of 8191
- 37i,10n,32p,760b,857s stack positions out of 5000i,500n,10000p,200000b,80000s
-</usr/local/texlive/2015basic/texmf-dist/fonts/type1/public/amsfonts/cm/cmbx10.pfb></usr/local/texlive/2015basic/texmf-dist/fonts/type1/public/amsfonts/cm/cmbx12.pfb></usr/local/texlive/2015basic/texmf-dist/fonts/type1/public/amsfonts/cm/cmex10.pfb></usr/local/texlive/2015basic/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi10.pfb></usr/local/texlive/2015basic/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi6.pfb></usr/local/texlive/2015basic/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi8.pfb></usr/local/texlive/2015basic/texmf-dist/fonts/type1/public/amsfonts/cm/cmr10.pfb></usr/local/texlive/2015basic/texmf-dist/fonts/type1/public/amsfonts/cm/cmr12.pfb></usr/local/texlive/2015basic/texmf-dist/fonts/type1/public/amsfonts/cm/cmr17.pfb></usr/local/texlive/2015basic/texmf-dist/fonts/type1/public/amsfonts/cm/cmr6.pfb></usr/local/texlive/2015basic/texmf-dist/fonts/type1/public/amsfonts/cm/cmr8.pfb></usr/local/texlive/2015basic/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy10.pfb></usr/local/texlive/2015basic/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy6.pfb></usr/local/texlive/2015basic/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy8.pfb></usr/local/texlive/2015basic/texmf-dist/fonts/type1/public/amsfonts/symbols/msbm10.pfb>
-Output written on "/Users/abali/Drive/Code/ml_coursera/.texpadtmp/Machine Learning Notes.pdf" (29 pages, 250231 bytes).
+ 37i,10n,32p,1060b,857s stack positions out of 5000i,500n,10000p,200000b,80000s
+</usr/local/texlive/2015basic/texmf-dist/fonts/type1/public/amsfonts/cm/cmbx10.pfb></usr/local/texlive/2015basic/texmf-dist/fonts/type1/public/amsfonts/cm/cmbx12.pfb></usr/local/texlive/2015basic/texmf-dist/fonts/type1/public/amsfonts/cm/cmex10.pfb></usr/local/texlive/2015basic/texmf-dist/fonts/type1/public/amsfonts/cmextra/cmex8.pfb></usr/local/texlive/2015basic/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi10.pfb></usr/local/texlive/2015basic/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi6.pfb></usr/local/texlive/2015basic/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi8.pfb></usr/local/texlive/2015basic/texmf-dist/fonts/type1/public/amsfonts/cm/cmr10.pfb></usr/local/texlive/2015basic/texmf-dist/fonts/type1/public/amsfonts/cm/cmr12.pfb></usr/local/texlive/2015basic/texmf-dist/fonts/type1/public/amsfonts/cm/cmr17.pfb></usr/local/texlive/2015basic/texmf-dist/fonts/type1/public/amsfonts/cm/cmr6.pfb></usr/local/texlive/2015basic/texmf-dist/fonts/type1/public/amsfonts/cm/cmr8.pfb></usr/local/texlive/2015basic/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy10.pfb></usr/local/texlive/2015basic/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy6.pfb></usr/local/texlive/2015basic/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy8.pfb></usr/local/texlive/2015basic/texmf-dist/fonts/type1/public/amsfonts/symbols/msbm10.pfb>
+Output written on "/Users/abali/Drive/Code/ml_coursera/.texpadtmp/Machine Learning Notes.pdf" (37 pages, 281505 bytes).
 PDF statistics:
- 158 PDF objects out of 1000 (max. 8388607)
- 110 compressed objects within 2 object streams
+ 190 PDF objects out of 1000 (max. 8388607)
+ 133 compressed objects within 2 object streams
  0 named destinations out of 1000 (max. 500000)
  1 words of extra memory for PDF output out of 10000 (max. 10000000)
 
