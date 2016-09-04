@@ -16,7 +16,8 @@ sim = 0;
 %
 %
 
-
+subtraction = x1 - x2;
+sim = exp(-(norm(subtraction))^2 / (2*sigma^2));
 
 
 
